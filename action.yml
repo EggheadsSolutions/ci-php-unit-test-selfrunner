@@ -1,0 +1,37 @@
+name: 'PHP Unit Test SelfRunner'
+description: 'PHP Unit Test SelfRunner'
+
+inputs:
+  app-local-php:
+    description: 'App Local PHP Config'
+    required: true
+
+  ca-pem:
+    description: 'ca.pem'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup config
+      run: echo "${{ inputs.app-local-php }}" > ./config/app_local.php
+      shell: bash
+
+    - name: Setup ca.pem
+      run: echo "${{ inputs.ca-pem }}" > ./config/CA.pem
+      shell: bash
+
+    - name: Copy composer.phar
+      run: |
+        cp /home/actions-runner/composer.phar composer.phar
+      shell: bash
+
+    - name: Composer install
+      run: ./composer.phar install
+      shell: bash
+
+    - name: UnitTest
+      run: vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always --configuration vendor/artskills/common/src/TestSuite/phpunit.xml
+      shell: bash
