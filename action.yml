@@ -2,13 +2,15 @@ name: 'PHP Unit Test SelfRunner'
 description: 'PHP Unit Test SelfRunner'
 
 inputs:
-  app-local-php:
-    description: 'App Local PHP Config'
+  config-file:
+    description: 'Path to phpunit.xml'
     required: true
+    default: phpunit.xml.dist
 
-  ca-pem:
-    description: 'ca.pem'
+  additional-parameters:
+    description: 'Additional parameters for the phpunit command'
     required: true
+    default: ''
 
 runs:
   using: "composite"
@@ -16,16 +18,15 @@ runs:
     - uses: actions/checkout@v2
 
     - name: Setup config
-      run: echo "${{ inputs.app-local-php }}" > ./config/app_local.php
+      run: mv ./config/app_local_ci.php ./config/app_local.php
       shell: bash
 
     - name: Setup ca.pem
-      run: echo "${{ inputs.ca-pem }}" > ./config/CA.pem
+      run: cp /home/actions-runner/CA.pem ./config/CA.pem
       shell: bash
 
     - name: Copy composer.phar
-      run: |
-        cp /home/actions-runner/composer.phar composer.phar
+      run: cp /home/actions-runner/composer.phar composer.phar
       shell: bash
 
     - name: Composer install
@@ -33,5 +34,5 @@ runs:
       shell: bash
 
     - name: UnitTest
-      run: vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always --configuration vendor/artskills/common/src/TestSuite/phpunit.xml
+      run: vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always --configuration ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
