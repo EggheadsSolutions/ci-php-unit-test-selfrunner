@@ -12,13 +12,28 @@ inputs:
     required: true
     default: ''
 
+  public-project:
+    description: 'Public or Provate project'
+    required: true
+    default: 'no'
+
+  app-local-php:
+    description: 'App Local PHP Config'
+    required: false
+
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v2
 
     - name: Setup config
+      if: ${{ inputs.public-project == 'no' }}
       run: mv ./config/app_local_ci.php ./config/app_local.php
+      shell: bash
+
+    - name: Setup secret config
+      if: ${{ inputs.public-project == 'yes' }}
+      run: echo "${{ inputs.app-local-php }}" > ./config/app_local.php
       shell: bash
 
     - name: Setup ca.pem
