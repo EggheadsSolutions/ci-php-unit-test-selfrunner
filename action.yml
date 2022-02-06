@@ -21,6 +21,10 @@ inputs:
     description: 'App Local PHP Config'
     required: false
 
+  ch-username:
+    description: 'Username for Clickhouse Database'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -49,5 +53,7 @@ runs:
       shell: bash
 
     - name: UnitTest
+      env:
+        ch-username: ${{ inputs.ch-username }}
       run: vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always --configuration ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
