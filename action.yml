@@ -17,19 +17,21 @@ runs:
   steps:
     - uses: actions/checkout@v2
 
+    - run: echo $WORK_DIR
+      shell: bash
+
     - name: Set Variables
       run: |
           if [[ $GITHUB_REPOSITORY == *"eggheads-ozon"* ]]; then
               echo "WORK_DIR=$HOME/runner_ozon/configs" >> "$GITHUB_ENV"
           elif [[ $GITHUB_REPOSITORY == *"php-eggheads"* ]]; then
               echo "WORK_DIR=$HOME/runner_eggheads/configs" >> "$GITHUB_ENV"
-          elif [[ $GITHUB_REPOSITORY == *"php-eggheads"* ]]; then
-              echo "WORK_DIR=$HOME/runner_eggheads/configs" >> "$GITHUB_ENV"
+          elif [[ $GITHUB_REPOSITORY == *"eggheads-wb-sells-parser"* ]]; then
+              echo "WORK_DIR=$HOME/runner_wbsells/configs" >> "$GITHUB_ENV"
           fi
       shell: bash
 
-    - name: debug
-      run: echo $WORK_DIR
+    - run: echo $WORK_DIR
       shell: bash
 
     - name: Setup config
