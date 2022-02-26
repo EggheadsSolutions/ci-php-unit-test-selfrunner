@@ -28,6 +28,10 @@ runs:
           fi
       shell: bash
 
+    - name: debug
+      run: echo $WORK_DIR
+      shell: bash
+
     - name: Setup config
       run: cp $WORK_DIR/app_local.php ./config/app_local.php      
       shell: bash
