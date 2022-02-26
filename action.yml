@@ -45,7 +45,7 @@ runs:
       shell: bash
 
     - name: Copy php-backend-token
-      if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
+      if: ${{ (contains(github.repository, 'eggheads-ozon')) || (contains(github.repository, 'php-eggheads')) }}
       run: cp $WORK_DIR/php-backend-token.json ./tmp/php-backend.json
       shell: bash
 
@@ -69,7 +69,7 @@ runs:
       shell: bash
 
     - name: MySQL run init.sql
-      if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
+      if: ${{ (contains(github.repository, 'eggheads-ozon')) || (contains(github.repository, 'php-eggheads')) }}
       run: cat $WORK_DIR/eggheads-init.sql | mysql --login-path=php-eggheads.conf
       shell: bash
 
@@ -79,7 +79,7 @@ runs:
       shell: bash
 
     - name: Run migrations
-      if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
+      if: ${{ (contains(github.repository, 'eggheads-ozon')) || (contains(github.repository, 'php-eggheads')) }}
       run: vendor/bin/phinx migrate
       shell: bash
 
