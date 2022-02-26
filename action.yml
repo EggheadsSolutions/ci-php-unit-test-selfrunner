@@ -26,6 +26,7 @@ runs:
           elif [[ $GITHUB_REPOSITORY == *"php-eggheads"* ]]; then
               echo "WORK_DIR=$HOME/runner_eggheads/configs" >> "$GITHUB_ENV"
           fi
+      shell: bash
 
     - name: Setup config
       run: cp $WORK_DIR/app_local.php ./config/app_local.php      
