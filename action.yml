@@ -26,6 +26,80 @@ runs:
   steps:
     - uses: actions/checkout@v2
 
+    - name: Set Variables
+      run: |
+        if [[ $GITGUB_REPOSITORY ]]
+
+    - name: Setup config
+      run: cp ~/$work_dir/app_local.php ./config/app_local.php
+      
+      shell: bash
+
+    - name: Setup ca.pem
+      run: cp ~/CA.pem ./config/CA.pem
+      shell: bash
+
+    - name: Copy composer.phar
+      run: cp ~/composer.phar composer.phar
+      shell: bash
+
+    - name: Create tmp folder
+      run: mkdir -p ./tmp
+      shell: bash
+
+    - name: Copy php-backend-token
+      if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
+      run: cp php-backend-token.json ./tmp/php-backend.json
+      shell: bash
+
+    - name: Copy php-frontend.json
+      if: ${{ contains(github.repository, 'php-eggheads') }}
+      run: cp php-frontend.json ./config/php-frontend.json
+      shell: bash
+
+    - name: Copy php-backend-token.json
+      if: ${{ contains(github.repository, 'php-eggheads') }}
+      run: cp php-backend-token.json ./tmp/php-backend.json
+      shell: bash
+
+    - name: Copy wb_supplier_token.conf
+      if: ${{ contains(github.repository, 'php-eggheads') }}
+      run: cp wb_supplier_token.conf ./tmp/wb_supplier_token.conf
+      shell: bash
+
+    - name: Composer install
+      run: ~/composer.phar install
+      shell: bash
+
+    - name: MySQL run init.sql
+      if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
+      run: cat eggheads-init.sql | mysql --login-path=php-eggheads.conf
+      shell: bash
+
+    - name: MySQL run eggheads.sql
+      if: ${{ contains(github.repository, 'php-eggheads') }}
+      run: cat eggheads.sql | mysql --login-path=php-eggheads.conf -Deggheads_release
+      shell: bash
+
+    - name: Run migrations
+      if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
+      run: vendor/bin/phinx migrate
+      shell: bash
+
+    - name: UnitTest
+      run: vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always --configuration ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      shell: bash
+
+    - name: Refresh Supplier Cabinet token
+      if: ${{ contains(github.repository, 'php-eggheads') }}
+      run: cp -p ./tmp/wb_supplier_token.conf ./wb_supplier_token.conf
+      shell: bash
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v2
+
     - name: Setup config
       if: ${{ inputs.public-project == 'no' }}
       run: mv ./config/app_local_ci.php ./config/app_local.php
@@ -46,10 +120,6 @@ runs:
 
     - name: Composer install
       run: ./composer.phar install
-      shell: bash
-
-    - name: test
-      run: env
       shell: bash
 
     - name: UnitTest
