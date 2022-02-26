@@ -12,15 +12,6 @@ inputs:
     required: true
     default: ''
 
-  public-project:
-    description: 'Public or Provate project'
-    required: true
-    default: 'no'
-
-  app-local-php:
-    description: 'App Local PHP Config'
-    required: false
-
 runs:
   using: "composite"
   steps:
@@ -28,11 +19,16 @@ runs:
 
     - name: Set Variables
       run: |
-        if [[ $GITGUB_REPOSITORY ]]
+          if [[ $GITHUB_REPOSITORY == *"eggheads-ozon"* ]]; then
+              echo "WORK_DIR=$HOME/runner_ozon/configs" >> "$GITHUB_ENV"
+          elif [[ $GITHUB_REPOSITORY == *"php-eggheads"* ]]; then
+              echo "WORK_DIR=$HOME/runner_eggheads/configs" >> "$GITHUB_ENV"
+          elif [[ $GITHUB_REPOSITORY == *"php-eggheads"* ]]; then
+              echo "WORK_DIR=$HOME/runner_eggheads/configs" >> "$GITHUB_ENV"
+          fi
 
     - name: Setup config
-      run: cp ~/$work_dir/app_local.php ./config/app_local.php
-      
+      run: cp $WORK_DIR/app_local.php ./config/app_local.php      
       shell: bash
 
     - name: Setup ca.pem
@@ -49,22 +45,22 @@ runs:
 
     - name: Copy php-backend-token
       if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
-      run: cp php-backend-token.json ./tmp/php-backend.json
+      run: cp $WORK_DIR/php-backend-token.json ./tmp/php-backend.json
       shell: bash
 
     - name: Copy php-frontend.json
       if: ${{ contains(github.repository, 'php-eggheads') }}
-      run: cp php-frontend.json ./config/php-frontend.json
+      run: cp $WORK_DIR/php-frontend.json ./config/php-frontend.json
       shell: bash
 
     - name: Copy php-backend-token.json
       if: ${{ contains(github.repository, 'php-eggheads') }}
-      run: cp php-backend-token.json ./tmp/php-backend.json
+      run: cp $WORK_DIR/php-backend-token.json ./tmp/php-backend.json
       shell: bash
 
     - name: Copy wb_supplier_token.conf
       if: ${{ contains(github.repository, 'php-eggheads') }}
-      run: cp wb_supplier_token.conf ./tmp/wb_supplier_token.conf
+      run: cp $WORK_DIR/wb_supplier_token.conf ./tmp/wb_supplier_token.conf
       shell: bash
 
     - name: Composer install
@@ -73,12 +69,12 @@ runs:
 
     - name: MySQL run init.sql
       if: ${{ contains(github.repository, 'eggheads-ozon') || ${{ contains(github.repository, 'php-eggheads') }}
-      run: cat eggheads-init.sql | mysql --login-path=php-eggheads.conf
+      run: cat $WORK_DIR/eggheads-init.sql | mysql --login-path=php-eggheads.conf
       shell: bash
 
     - name: MySQL run eggheads.sql
       if: ${{ contains(github.repository, 'php-eggheads') }}
-      run: cat eggheads.sql | mysql --login-path=php-eggheads.conf -Deggheads_release
+      run: cat $WORK_DIR/eggheads.sql | mysql --login-path=php-eggheads.conf -Deggheads_release
       shell: bash
 
     - name: Run migrations
@@ -92,36 +88,5 @@ runs:
 
     - name: Refresh Supplier Cabinet token
       if: ${{ contains(github.repository, 'php-eggheads') }}
-      run: cp -p ./tmp/wb_supplier_token.conf ./wb_supplier_token.conf
-      shell: bash
-
-runs:
-  using: "composite"
-  steps:
-    - uses: actions/checkout@v2
-
-    - name: Setup config
-      if: ${{ inputs.public-project == 'no' }}
-      run: mv ./config/app_local_ci.php ./config/app_local.php
-      shell: bash
-
-    - name: Setup secret config
-      if: ${{ inputs.public-project == 'yes' }}
-      run: echo "${{ inputs.app-local-php }}" > ./config/app_local.php
-      shell: bash
-
-    - name: Setup ca.pem
-      run: cp /home/actions-runner/CA.pem ./config/CA.pem
-      shell: bash
-
-    - name: Copy composer.phar
-      run: cp /home/actions-runner/composer.phar composer.phar
-      shell: bash
-
-    - name: Composer install
-      run: ./composer.phar install
-      shell: bash
-
-    - name: UnitTest
-      run: vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always --configuration ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      run: cp -p ./tmp/wb_supplier_token.conf $WORK_DIR/wb_supplier_token.conf
       shell: bash
