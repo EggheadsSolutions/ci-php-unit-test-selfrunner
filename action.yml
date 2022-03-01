@@ -55,11 +55,6 @@ runs:
       run: cp $WORK_DIR/php-backend-token.json ./tmp/php-backend.json
       shell: bash
 
-    - name: Copy php-frontend.json
-      if: ${{ contains(github.repository, 'php-eggheads') }}
-      run: cp $WORK_DIR/php-frontend.json ./config/php-frontend.json
-      shell: bash
-
     - name: Copy php-backend-token.json
       if: ${{ contains(github.repository, 'php-eggheads') }}
       run: cp $WORK_DIR/php-backend-token.json ./tmp/php-backend.json
