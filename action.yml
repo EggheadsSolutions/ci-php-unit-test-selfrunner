@@ -51,7 +51,7 @@ runs:
       shell: bash
 
     - name: Copy php-backend.json
-      if: ${{ contains(github.repository, 'php-eggheads' }}
+      if: ${{ contains(github.repository, 'php-eggheads') }}
       run: cp $WORK_DIR/php-backend.json ./config/php-backend.json
       shell: bash
 
