@@ -39,11 +39,11 @@ runs:
       shell: bash
 
     - name: Setup ca.pem
-      run: cp ~/CA.pem ./config/CA.pem
+      run: cp /home/actions-runner/CA.pem ./config/CA.pem
       shell: bash
 
     - name: Copy composer.phar
-      run: cp ~/composer.phar composer.phar
+      run: cp /home/actions-runner/composer.phar composer.phar
       shell: bash
 
     - name: Create tmp folder
@@ -66,7 +66,7 @@ runs:
       shell: bash
 
     - name: Composer install
-      run: ~/composer.phar install
+      run: ./composer.phar install
       shell: bash
 
     - name: MySQL run init.sql
