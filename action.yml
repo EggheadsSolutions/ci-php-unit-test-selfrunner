@@ -12,10 +12,30 @@ inputs:
     required: true
     default: ''
 
+  composer-private-repo-key:
+    deacription: 'Use composer private repo'
+    required: true
+    default: 'no'
+
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v2
+
+    - name: Import SSH Key
+      if: ${{ inputs.composer-private-repo-key != 'no' }}
+      run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/egg_repository_key
+          chmod 600 ~/.ssh/egg_repository_key
+          cat > ~/.ssh/config <<END
+          Host github.com
+            HostName github.com
+            User git
+            IdentityFile ~/.ssh/egg_repository_key
+            StrictHostKeyChecking no
+          END
+      shell: bash
 
     - run: echo $WORK_DIR
       shell: bash
