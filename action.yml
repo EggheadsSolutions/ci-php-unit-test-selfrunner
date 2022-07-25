@@ -17,6 +17,11 @@ inputs:
     required: true
     default: 'no'
 
+  printer:
+    deacription: 'printer'
+    required: true
+    default: '--printer mheap\\GithubActionsReporter\\Printer'
+
 runs:
   using: "composite"
   steps:
@@ -105,7 +110,7 @@ runs:
       shell: bash
 
     - name: UnitTest
-      run: vendor/bin/phpunit --printer mheap\\GithubActionsReporter\\Printer --colors=always --configuration ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
+      run: vendor/bin/phpunit ${{ inputs.printer }} --colors=always --configuration ${{ inputs.config-file }} ${{ inputs.additional-parameters }}
       shell: bash
 
     - name: Refresh Supplier Cabinet token
